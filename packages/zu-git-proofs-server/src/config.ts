@@ -3,11 +3,20 @@ import type { FastifyInstance } from "fastify";
 
 const schema: FastifyEnvOptions["schema"] = {
   type: 'object',
-  required: [ 'PORT' ],
+  required: [ 'SERVER_PRIVATE_KEY', 'GITHUB_CLIENT_ID', 'GITHUB_CLIENT_SECRET'],
   properties: {
     PORT: {
       type: 'number',
       default: 3000
+    },
+    SERVER_PRIVATE_KEY: {
+      type: 'string'
+    },
+    GITHUB_CLIENT_ID: {
+      type: 'string'
+    },
+    GITHUB_CLIENT_SECRET: {
+      type: 'string'
     }
   }
 }
@@ -15,7 +24,7 @@ const schema: FastifyEnvOptions["schema"] = {
 const envOptions: FastifyEnvOptions = {
     schema,
     dotenv: {
-        path: `${__dirname}/.env`,
+        path: `${__dirname}/../.env`,
         debug: true
     },
     env: true
@@ -31,6 +40,7 @@ declare module 'fastify' {
         PORT: number,
         GITHUB_CLIENT_ID: string,
         GITHUB_CLIENT_SECRET: string,
+        SERVER_PRIVATE_KEY: string
       };
     }
   }

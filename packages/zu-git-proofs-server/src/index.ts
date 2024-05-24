@@ -2,12 +2,16 @@ import fastify from 'fastify'
 import {fastifyCors} from '@fastify/cors'
 import { registerEnvPlugin } from './config'
 import { registerRoutes } from './routes';
+import { MessagePCDPackage } from "@pcd/message-pcd";
+import { registerFeedService } from './feed';
 
 const server = fastify();
 
 async function init() {
+  await MessagePCDPackage.init?.({});
   await registerEnvPlugin(server)
-  server.register(fastifyCors, {
+  await registerFeedService(server)
+  await server.register(fastifyCors, {
     origin: true
   })
 

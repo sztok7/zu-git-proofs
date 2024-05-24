@@ -1,0 +1,29 @@
+.App {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10rem;
+}
+
+.btn-github {
+    cursor: pointer;
+    background-color: rgb(75, 85, 99);
+    color: white;
+
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.5rem;
+
+    border-width: 0;
+    border-style: solid;
+    border-color: #e5e7eb;
+    border-radius: 0.5rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20rem;
+    
+}

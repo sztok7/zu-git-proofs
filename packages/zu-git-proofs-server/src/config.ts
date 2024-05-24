@@ -28,7 +28,9 @@ export async function registerEnvPlugin(server: FastifyInstance): Promise<void> 
 declare module 'fastify' {
     interface FastifyInstance {
       config: {
-        PORT: number
+        PORT: number,
+        GITHUB_CLIENT_ID: string,
+        GITHUB_CLIENT_SECRET: string,
       };
     }
   }

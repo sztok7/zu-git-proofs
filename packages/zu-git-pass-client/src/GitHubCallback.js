@@ -6,14 +6,14 @@ export default function GitHubCallback() {
         const code = urlParams.get('code');
 
         if (code) {
-            fetch(`${process.env.REACT_APP_ZU_GIT_SERVER_API}/auth/github/callback`, {
+            fetch(`${process.env.REACT_APP_ZU_GIT_SERVER_API}/auth/github`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code }),
             })
             .then(response => response.json())
             .then(data => {
-                // return jwt to discourse and close popup
+                // close popup
             });
         }
     }, []);

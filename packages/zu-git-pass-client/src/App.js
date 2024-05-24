@@ -9,7 +9,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<div className="App"><GithubLogin /></div>} />
-        <Route path="/github/callback" element={<GitHubCallback />} />
+        <Route path="/auth/github/callback" element={<GitHubCallback />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  server:
+    image: ghcr.io/mpetrunic/zu-git-proofs-server:v0.1
+    container_name: zu-git-proof-server
+    env_file: zu-git-pass.env
+    ports:
+      - "9000:3000"

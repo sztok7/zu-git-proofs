@@ -1,0 +1,15 @@
+# Stage 1: Build the TypeScript code
+FROM node:20-alpine AS build
+
+WORKDIR /app
+
+RUN corepack enable
+
+COPY package.json yarn.lock .yarn .yarnrc.yml ./
+COPY packages/zu-git-proofs-server/package.json packages/zu-git-proofs-server/
+
+RUN yarn workspaces focus zu-git-proofs-server
+
+COPY . .
+
+CMD ["yarn", "workspace", "zu-git-proofs-server", "run", "start"]

@@ -4,7 +4,7 @@ export default function GithubLogin() {
     const loginWithGitHub = React.useCallback(() => {
         const clientID = process.env.REACT_APP_GITHUB_CLIENT_ID;
         const redirectURI = `${window.location.href}auth/github/callback`;
-        window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientID}&redirect_uri=${redirectURI}`;
+        window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientID}&redirect_uri=${redirectURI}&scope=read:user,user:email`;
     }, []);
 
     return (

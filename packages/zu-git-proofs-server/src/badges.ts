@@ -1,15 +1,18 @@
-import jsonData from './artifacts/badge-members.json'
+// @ts-expect-error
+import jsonData from './artifacts/badge-members.json' assert {type: 'json'};
 
 
-export async function getGithubBadhes(githubUsername: string): Promise<string|undefined> {
-    const badges: string[] = []
+export async function getGithubBadhes(githubEmails: string[]): Promise<string|undefined> {
+    const badges = new Set()
     Object.entries(jsonData).forEach(([badge, badgeMembers]) => {
-        if((badgeMembers as string[]).includes(githubUsername.toLowerCase())) {
-            badges.push(badge)
-        }
+        githubEmails.forEach((email) => {
+            if((badgeMembers as string[]).includes(email.toLowerCase())) {
+                badges.add(badge)
+            }
+        })
     })
-    if(badges.length == 0) {
+    if(badges.size == 0) {
         return undefined
     }
-    return badges.join(",")
+    return Array.from(badges.values()).join(",")
 }

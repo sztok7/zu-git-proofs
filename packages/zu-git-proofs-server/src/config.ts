@@ -11,6 +11,10 @@ const schema: FastifyEnvOptions["schema"] = {
       type: 'number',
       default: 3000
     },
+    HOST: {
+      type: "string",
+      default: "localhost"
+    },
     SERVER_PRIVATE_KEY: {
       type: 'string'
     },
@@ -48,6 +52,7 @@ declare module 'fastify' {
     interface FastifyInstance {
       config: {
         PORT: number,
+        HOST: string,
         GITHUB_CLIENT_ID: string,
         GITHUB_CLIENT_SECRET: string,
         SERVER_PRIVATE_KEY: string,

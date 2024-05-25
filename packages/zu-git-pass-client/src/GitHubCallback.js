@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 
 export default function GitHubCallback() {
+
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
-
+        console.log("Running effect", code)
         if (code) {
             fetch(`${process.env.REACT_APP_ZU_GIT_SERVER_API}/auth/github`, {
                 method: 'POST',

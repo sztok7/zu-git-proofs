@@ -1,7 +1,7 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { Octokit } from "octokit";
 import { storeZupassBadge } from "../db.js";
-import { getGithubBadhes } from "../badges.js";
+import { getGithubBadhes as getGithubBadges } from "../badges.js";
 
 
 export function authRoute(server: FastifyInstance): void {
@@ -16,7 +16,7 @@ export function authRoute(server: FastifyInstance): void {
     ) => {
         try {
             const { code, zupassEmail } = req.body;
-
+            console.log("Received callback", code, zupassEmail)
             const tokenAuthentication = await server.oauth({
                 type: "oauth-user",
                 code: code,
@@ -25,10 +25,9 @@ export function authRoute(server: FastifyInstance): void {
             const octokit = new Octokit({
                 auth: tokenAuthentication.token,
             });
-            const { data: { login } } = await octokit.rest.users.getAuthenticated();
-            console.log("Authenticated user", {github: login, zupassEmail})
-            const badge = await getGithubBadhes(login)
-
+            const { data: emails } = await octokit.rest.users.listEmailsForAuthenticatedUser();
+            console.log("Authenticated user", {github: emails, zupassEmail})
+            const badge = await getGithubBadges(emails.map((email) => email.email))
             console.log("User badges", {zupassEmail, badges: badge})
             if(badge) {
                 await storeZupassBadge(server.db, zupassEmail, badge)

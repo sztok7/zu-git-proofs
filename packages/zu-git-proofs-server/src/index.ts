@@ -23,7 +23,7 @@ async function init() {
 
 
 init().then(() => {
-    server.listen({ port: server.config.PORT }, (err, address) => {
+    server.listen({ port: server.config.PORT, host: server.config.HOST }, (err, address) => {
       if (err) {
         console.error(err)
         process.exit(1)

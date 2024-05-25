@@ -1,4 +1,5 @@
 login:
+  disable_emails: true
   oauth2_enabled:
     default: false
     client: true
@@ -49,5 +50,5 @@ login:
   oauth2_allow_association_change:
     default: false
   oauth2_disable_csrf:
-    default: false
-    hidden: true
+    default: true
+    hidden: false

@@ -1,37 +1,52 @@
 # frozen_string_literal: true
 
-class OmniAuth::Strategies::Oauth2Basic < ::OmniAuth::Strategies::OAuth2
+class OmniAuth::Strategies::Oauth2Basic
+  include OmniAuth::Strategy
+
   option :name, "oauth2_basic"
 
   uid do
-    if path = SiteSetting.oauth2_callback_user_id_path.split(".")
-      recurse(access_token, [*path]) if path.present?
-    end
+    request.params['email']
   end
 
-  info do
-    if paths = SiteSetting.oauth2_callback_user_info_paths.split("|")
-      result = Hash.new
-      paths.each do |p|
-        segments = p.split(":")
-        if segments.length == 2
-          key = segments.first
-          path = [*segments.last.split(".")]
-          result[key] = recurse(access_token, path)
-        end
-      end
-      result
+  # info do
+  #   {
+  #     pcd: request.params['pcd'],
+  #     signature: request.params['signature'],
+  #     badges: request.params['badges'].split('.'),
+  #     display_name: "anon" + request.params['email'].split("@").first
+  #   }
+  # end
+
+  def callback_phase
+    # Verify pcd
+
+    # Create or login user
+    display_name = "anon" + request.params['email'].split("@").first
+    email = request.params['email']
+    user = User.find_by_email(email)
+
+    if !user
+      username = UserNameSuggester.sanitize_username(display_name)
+      newuser = User.create!(
+          email: email,
+          username: username,
+          name: display_name.presence || User.suggest_name(email),
+          active: true,
+        )
+      
+      cookie_jar = ActionDispatch::Request.new(request.env).cookie_jar
+      provider = Discourse.current_user_provider.new(request.env)
+      provider.log_on_user(newuser, session, cookie_jar)
+    else
+      cookie_jar = ActionDispatch::Request.new(request.env).cookie_jar
+      provider = Discourse.current_user_provider.new(request.env)
+      provider.log_on_user(user, session, cookie_jar)
     end
+    super
   end
 
   def callback_url
     Discourse.base_url_no_prefix + script_name + callback_path
-  end
-
-  def recurse(obj, keys)
-    return nil if !obj
-    k = keys.shift
-    result = obj.respond_to?(k) ? obj.send(k) : obj[k]
-    keys.empty? ? result : recurse(result, keys)
   end
 end

@@ -24,7 +24,7 @@ DiscoursePluginRegistry.define_filtered_register :oauth2_basic_additional_json_p
 #   required_value: true,
 #   error_message: I18n.t("auth.user_not_allowed")
 # }, self)
-DiscoursePluginRegistry.define_filtered_register :oauth2_basic_required_json_paths
+# DiscoursePluginRegistry.define_filtered_register :oauth2_basic_required_json_paths
 
 auth_provider title_setting: "oauth2_button_title", authenticator: OAuth2BasicAuthenticator.new
 

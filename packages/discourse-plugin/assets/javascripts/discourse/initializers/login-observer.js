@@ -69,7 +69,7 @@ export default {
           };
   
           // Call the function to set up the observer
-          observeLoginButton();
+          // observeLoginButton();
         });
       });
     }

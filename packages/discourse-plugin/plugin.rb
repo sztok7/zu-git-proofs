@@ -1,18 +1,31 @@
 # frozen_string_literal: true
 
-# name: zu-git-proofs
-# about: Connects user with zupass to collect and verify github contributions
-# version: 0.0.1
-# url: https://github.com/sztok7/zu-git-proofs/tree/main/packages/discourse-plugin
+# name: zupass-login
+# about: Allows users to login with zupass.
+# version: 0.1
 
-enabled_site_setting :plugin_name_enabled
+enabled_site_setting :oauth2_enabled
 
-module ::MyPluginModule
-  PLUGIN_NAME = "zu-git-proofs"
-end
+require_relative "lib/omniauth/strategies/oauth2_basic"
+require_relative "lib/oauth2_faraday_formatter"
+require_relative "lib/oauth2_basic_authenticator"
 
-require_relative "lib/my_plugin_module/engine"
+# You should use this register if you want to add custom paths to traverse the user details JSON.
+# We'll store the value in the user associated account's extra attribute hash using the full path as the key.
+DiscoursePluginRegistry.define_filtered_register :oauth2_basic_additional_json_paths
 
-after_initialize do
-  # Code which should run after Rails has finished booting
-end
+# After authentication, we'll use this to confirm that the registered json paths are fulfilled, or display an error.
+# This requires SiteSetting.oauth2_fetch_user_details? to be true, and can be used with
+# DiscoursePluginRegistry.oauth2_basic_additional_json_paths.
+#
+# Example usage:
+# DiscoursePluginRegistry.register_oauth2_basic_required_json_path({
+#   path: "extra:data.is_allowed_user",
+#   required_value: true,
+#   error_message: I18n.t("auth.user_not_allowed")
+# }, self)
+DiscoursePluginRegistry.define_filtered_register :oauth2_basic_required_json_paths
+
+auth_provider title_setting: "oauth2_button_title", authenticator: OAuth2BasicAuthenticator.new
+
+require_relative "lib/validators/oauth2_basic/oauth2_fetch_user_details_validator"

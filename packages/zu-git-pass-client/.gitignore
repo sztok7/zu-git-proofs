@@ -1,5 +1,4 @@
 .env*.local
-public
 
 # dependencies
 /node_modules

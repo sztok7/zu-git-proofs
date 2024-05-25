@@ -1,25 +1,15 @@
-  import { MessagePCDPackage, type MessagePCD } from "@pcd/message-pcd";
-import {
-    FeedHost,
-    PollFeedRequest,
-    PollFeedResponseValue,
-    verifyCredential,
-} from "@pcd/passport-interface";
-import {
-    DeleteFolderPermission,
-    PCDAction,
-    PCDActionType,
-    PCDPermissionType,
-    type ReplaceInFolderPermission
-} from "@pcd/pcd-collection";
-import { ArgumentTypeName, SerializedPCD } from "@pcd/pcd-types";
+  import messagePcd from "@pcd/message-pcd";
+import passportInterface from "@pcd/passport-interface";
+import pcdCollection from "@pcd/pcd-collection";
+import pcdTypes from "@pcd/pcd-types";
 import { FastifyInstance, type FastifyPluginAsync } from "fastify";
+import { getZupassBadge } from "./db.js";
   
   const FOLDER = "Github Ranks"
 
   export async function registerFeedService(server: FastifyInstance) {
     const feedPlugin: FastifyPluginAsync = async (instance, opts) => {
-        const feedHost = new FeedHost(
+        const feedHost = new passportInterface.FeedHost(
             [
               {
                 feed: {
@@ -29,12 +19,12 @@ import { FastifyInstance, type FastifyPluginAsync } from "fastify";
                   permissions: [
                     {
                       folder: FOLDER,
-                      type: PCDPermissionType.DeleteFolder
-                    } as DeleteFolderPermission,
+                      type: pcdCollection.PCDPermissionType.DeleteFolder
+                    } as pcdCollection.DeleteFolderPermission,
                     {
                       folder: FOLDER,
-                      type: PCDPermissionType.ReplaceInFolder
-                    } as ReplaceInFolderPermission,
+                      type: pcdCollection.PCDPermissionType.ReplaceInFolder
+                    } as pcdCollection.ReplaceInFolderPermission,
                   ],
                   credentialRequest: {
                     signatureType: "sempahore-signature-pcd",
@@ -42,19 +32,21 @@ import { FastifyInstance, type FastifyPluginAsync } from "fastify";
                   }
                 },
                 handleRequest: async (
-                  req: PollFeedRequest
-                ): Promise<PollFeedResponseValue> => {
+                  req: passportInterface.PollFeedRequest
+                ): Promise<passportInterface.PollFeedResponseValue> => {
                   if (req.pcd === undefined) {
                     throw new Error(`Missing credential`);
                   }
                   
-                  const { emailClaim, emailSignatureClaim } = await verifyCredential(req.pcd);
+                  const { emailClaim, emailSignatureClaim } = await passportInterface.verifyCredential(req.pcd);
                   
                   if (emailClaim && emailSignatureClaim) {
                     // const verified =
                     //   _.isEqual(emailSignatureClaim.publicKey, ZUPASS_PUBLIC_KEY);
+                    console.log("Creating feed for email", emailClaim.emailAddress)
                     return {
                         actions: await feedActionsForEmail(
+                          server.db,
                           server.config.SERVER_PRIVATE_KEY,
                           emailClaim.emailAddress
                         )
@@ -64,7 +56,7 @@ import { FastifyInstance, type FastifyPluginAsync } from "fastify";
                 }
               }
             ],
-            "https://8c57-185-199-104-14.ngrok-free.app/feeds",
+            server.config.PUBLIC_SERVER_URL + "/feeds",
             "Zu Git Proof Feed Server"
           );
         instance.decorate("feed", feedHost)
@@ -76,39 +68,42 @@ import { FastifyInstance, type FastifyPluginAsync } from "fastify";
   } 
 
   async function feedActionsForEmail(
+    db: FastifyInstance["db"],
     privateKey: string, 
     emailAddress: string
-  ): Promise<PCDAction[]> {
+  ): Promise<pcdCollection.PCDAction[]> {
   
     const actions = [];
 
     // Clear out the folder
     actions.push({
-        type: PCDActionType.DeleteFolder,
+        type: pcdCollection.PCDActionType.DeleteFolder,
         folder: FOLDER,
         recursive: false
     });
   
-    //TODO: check bacdge by email
-    actions.push({
-        type: PCDActionType.ReplaceInFolder,
+    const badge = await getZupassBadge(db, emailAddress)
+    console.log("Obtained badges for zupassemail", {emailAddress, badge})
+    if(badge) {
+      actions.push({
+        type: pcdCollection.PCDActionType.ReplaceInFolder,
         folder: FOLDER,
         pcds: [
-            await issueBadgePCD(privateKey, "Core Contributor")
+            await issueBadgePCD(privateKey, badge.badge)
         ]
       });
-  
+    }
     return actions;
   }
   
   async function issueBadgePCD(
     privateKey: string,
     badge: string
-  ): Promise<SerializedPCD<MessagePCD>> {
+  ): Promise<pcdTypes.SerializedPCD<messagePcd.MessagePCD>> {
   
-    const pcd = await MessagePCDPackage.prove({
+    const pcd = await messagePcd.MessagePCDPackage.prove({
       message: {
-        argumentType: ArgumentTypeName.Object,
+        argumentType: pcdTypes.ArgumentTypeName.Object,
         value: {
             displayName: "Github Rank",
             mdBody: badge
@@ -116,20 +111,20 @@ import { FastifyInstance, type FastifyPluginAsync } from "fastify";
       },
       privateKey: {
         value: privateKey,
-        argumentType: ArgumentTypeName.String
+        argumentType: pcdTypes.ArgumentTypeName.String
       },
       id: {
         value: undefined,
-        argumentType: ArgumentTypeName.String
+        argumentType: pcdTypes.ArgumentTypeName.String
       }
     });
   
-    return MessagePCDPackage.serialize(pcd);
+    return messagePcd.MessagePCDPackage.serialize(pcd);
   }
   
   declare module 'fastify' {
     interface FastifyInstance {
-        feed: FeedHost
+        feed: passportInterface.FeedHost
     }
   }
 

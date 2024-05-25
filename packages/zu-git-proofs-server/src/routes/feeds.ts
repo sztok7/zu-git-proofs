@@ -1,4 +1,4 @@
-import { getEdDSAPublicKey } from "@pcd/eddsa-pcd";
+import eddsaPcd from "@pcd/eddsa-pcd";
 import type { ListFeedsRequest, PollFeedRequest } from "@pcd/passport-interface";
 import type { FastifyInstance } from "fastify";
 
@@ -34,7 +34,7 @@ export function getFeed(server: FastifyInstance) {
 export function getEcdsaKey(server: FastifyInstance) {
     server.get("/issue/eddsa-public-key", async (req, res) => {
         return res.send(
-          await getEdDSAPublicKey(server.config.SERVER_PRIVATE_KEY)
+          await eddsaPcd.getEdDSAPublicKey(server.config.SERVER_PRIVATE_KEY)
         );
       });
 }

@@ -1,20 +1,23 @@
 import fastify from 'fastify'
 import {fastifyCors} from '@fastify/cors'
-import { registerEnvPlugin } from './config'
-import { registerRoutes } from './routes';
-import { MessagePCDPackage } from "@pcd/message-pcd";
-import { registerFeedService } from './feed';
+import { registerEnvPlugin } from './config.js'
+import { registerRoutes } from './routes.js';
+import messagePcd from "@pcd/message-pcd";
+import { registerFeedService } from './feed.js';
+import { initDb } from './db.js';
+import { registerGithubOAuthService } from './octokit.js';
 
 const server = fastify();
 
 async function init() {
-  await MessagePCDPackage.init?.({});
+  await messagePcd.MessagePCDPackage.init?.({});
   await registerEnvPlugin(server)
+  await initDb(server)
   await registerFeedService(server)
   await server.register(fastifyCors, {
     origin: true
   })
-
+  await registerGithubOAuthService(server)
   await registerRoutes(server)
 }
 

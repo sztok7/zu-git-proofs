@@ -58,4 +58,4 @@ const ranks = Object.entries(contributions).reduce((acc, [email, contributionRat
     return acc;
 }, {} as Record<string, string[]>)
 
-await write('contributions.json', JSON.stringify(ranks, null, 2));
+await write('badge-members.json', JSON.stringify(ranks, null, 2));

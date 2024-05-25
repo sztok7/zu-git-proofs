@@ -180,4 +180,4 @@ repositories/*/
 # Un-ignore all files inside the repositories directory
 !repositories/*.*
 
-contributions.json
+badge-members.json

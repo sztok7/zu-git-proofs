@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
-import { pingRoute } from "./routes/ping";
-import { getEcdsaKey, getFeed, getFeeds, postFeeds } from "./routes/feeds";
-import { authRoute } from "./routes/auth";
+import { pingRoute } from "./routes/ping.js";
+import { getEcdsaKey, getFeed, getFeeds, postFeeds } from "./routes/feeds.js";
+import { authRoute } from "./routes/auth.js";
 
 export async function registerRoutes(server: FastifyInstance) {
     pingRoute(server)

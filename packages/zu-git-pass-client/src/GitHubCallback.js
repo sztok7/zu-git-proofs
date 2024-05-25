@@ -9,7 +9,8 @@ export default function GitHubCallback() {
             fetch(`${process.env.REACT_APP_ZU_GIT_SERVER_API}/auth/github`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code }),
+                // TODO figure out from where to take zupass email
+                body: JSON.stringify({ code, zupassEmail: "marin@chainsafe.io" }),
             })
             .then(response => response.json())
             .then(data => {

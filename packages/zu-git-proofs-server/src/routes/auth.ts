@@ -1,4 +1,7 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { Octokit } from "octokit";
+import { storeZupassBadge } from "../db.js";
+import { getGithubBadhes } from "../badges.js";
 
 
 export function authRoute(server: FastifyInstance): void {
@@ -6,34 +9,35 @@ export function authRoute(server: FastifyInstance): void {
         req: FastifyRequest<{
             Body: {
                 code: string;
+                zupassEmail: string;
             }
         }>,
         res: FastifyReply
     ) => {
-        const { code } = req.body;
+        try {
+            const { code, zupassEmail } = req.body;
 
-        // Exchange the code for an access token
-        const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
-            body: JSON.stringify({
-                client_id: server.config.GITHUB_CLIENT_ID,
-                client_secret: server.config.GITHUB_CLIENT_SECRET,
-                code,
-            }),
-        });
+            const tokenAuthentication = await server.oauth({
+                type: "oauth-user",
+                code: code,
+              });
 
-        const tokenData = await tokenResponse.json() as any;
-        const accessToken = tokenData.access_token;
+            const octokit = new Octokit({
+                auth: tokenAuthentication.token,
+            });
+            const { data: { login } } = await octokit.rest.users.getAuthenticated();
+            console.log("Authenticated user", {github: login, zupassEmail})
+            const badge = await getGithubBadhes(login)
 
-        if (accessToken) {
-            // do things with jwt
-            res.send({ success: true });
-        } else {
-            res.send({ success: false });
+            console.log("User badges", {zupassEmail, badges: badge})
+            if(badge) {
+                await storeZupassBadge(server.db, zupassEmail, badge)
+            }
+            console.log("Returning success")
+            return res.send({ success: true });
+        } catch(e) {
+            console.error(e)
+            res.send({success: false})
         }
     });
 }

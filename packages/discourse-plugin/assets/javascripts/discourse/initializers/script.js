@@ -1,5 +1,5 @@
 import { withPluginApi } from 'discourse/lib/plugin-api';
-import zuauth from "../lib/pcd-zuauth";
+import { zuAuthPopup } from "../lib/pcd-zuauth";
 
 const fieldsToReveal = {
   revealTicketId: true,
@@ -7,6 +7,18 @@ const fieldsToReveal = {
   revealAttendeeSemaphoreId: true,
   revealProductId: true,
 };
+
+const config = [
+  {
+    pcdType: "eddsa-ticket-pcd",
+    publicKey: [
+      "1ebfb986fbac5113f8e2c72286fe9362f8e7d211dbc68227a468d7b919e75003",
+      "10ec38f11baacad5535525bbe8e343074a483c051aa1616266f3b1df3fb7d204"
+    ],
+    eventId: "53edb3e7-6733-41e0-a9be-488877c5c572",
+    eventName: "ETHBerlin04"
+  }
+];
 
 export default {
     name: 'listener',
@@ -20,11 +32,11 @@ export default {
               console.log('Custom login action!');
 
               try {
-                const result = await zuauth.zuAuthPopup({
-                  zupassUrl: process.env.NEXT_PUBLIC_ZUPASS_SERVER_URL,
+                const result = await zuAuthPopup({
+                  zupassUrl: "https://zupass.org/",
                   fieldsToReveal,
-                  watermark: '11114r50',
-                  config: zuauth.ETHBERLIN04
+                  watermark: BigInt(Math.trunc(Math.random() * 1e15)),
+                  config
                 });
                 console.log(result);
               } catch (e) {

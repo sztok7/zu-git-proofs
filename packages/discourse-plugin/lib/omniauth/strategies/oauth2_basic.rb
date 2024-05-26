@@ -34,6 +34,7 @@ class OmniAuth::Strategies::Oauth2Basic
           name: display_name.presence || User.suggest_name(email),
           active: true,
         )
+      user = newuser
       
       cookie_jar = ActionDispatch::Request.new(request.env).cookie_jar
       provider = Discourse.current_user_provider.new(request.env)
@@ -43,6 +44,28 @@ class OmniAuth::Strategies::Oauth2Basic
       provider = Discourse.current_user_provider.new(request.env)
       provider.log_on_user(user, session, cookie_jar)
     end
+
+    split_array = request.params['badges'].split(',')
+    split_array.each do |element|
+      new_badge = Badge.find_by(name: element)
+      unless new_badge
+        new_badge = Badge.create!(
+          name: element,
+          badge_type_id: 1
+        )
+      end
+
+      user_badge_exists = UserBadge.find_by(user_id: user.id, badge_id: new_badge.id)
+      unless user_badge_exists
+        UserBadge.create!(
+          user_id: user.id,
+          badge_id: new_badge.id,
+          granted_by_id: 1,
+          granted_at: Time.zone.now
+        )
+      end
+    end
+
     super
   end
 

@@ -1,5 +1,4 @@
 login:
-  disable_emails: true
   oauth2_enabled:
     default: false
     client: true

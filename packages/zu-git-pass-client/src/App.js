@@ -9,8 +9,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<div className="App"><GithubLogin /></div>} />
-        <Route path="/auth/zupass" element={<ZupassLogin />} />
+        <Route path="/auth/github" element={<div className="App"><GithubLogin /></div>} />
+        <Route path="/" element={<div className="App"> <ZupassLogin /></div>} />
         <Route path="/auth/github/callback" element={<GitHubCallback />} />
       </Routes>
     </BrowserRouter>

@@ -1,29 +1,53 @@
-// import { zuAuthRedirect } from './lib/pcd-zuauth.js';
 import { useCallback } from 'react';
-// import { constructZupassPcdGetRequestUrl } from '@pcd/passport-interface';
 import { getWithoutProvingUrl } from '@pcd/passport-interface/PassportInterface';
 import { zupassPopupExecute } from '@pcd/passport-interface';
+import { MessagePCDPackage } from '@pcd/message-pcd'
 
-const constructWhatev = () => {
-  // constructZupassPcdGetRequestUrl('https://zupass.org', window.location.pathname, 'message-pcd', {});
-  const result = getWithoutProvingUrl('https://zupass.org', window.location.href, 'message-pcd', true)
-
-  console.log(result)
-
-  return result
+const constructProofUrl = () => {
+    return getWithoutProvingUrl('https://zupass.org', window.location.href, 'message-pcd', true)
 }
 
-
 export default function ZupassLogin() {
-  const login = useCallback(async () => {
-    const route = constructWhatev();
+    const login = useCallback(async () => {
+        const proofUrl = constructProofUrl();
 
-    // await zupassPopupSetup()
+        const result = await zupassPopupExecute(proofUrl)
 
-    await zupassPopupExecute(route)
-  }, []);
 
-  return (
-    <button onClick={login}>Login mit dem Zupass</button>
-  );
+        if (result.type !== 'pcd') return
+
+        console.log(result.pcdStr)
+
+        const pcd = MessagePCDPackage.deserialize(result.pcdStr)
+
+        console.log(pcd)
+
+        const discourseUrl = process.env.DISCOURSE_URL // searchParams.get('discourse_url')
+
+        try {
+            const response = await fetch(discourseUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    pcd: 'rfgeghfihefuyifghodgf',
+                    email: 'anon@anon.xyz',
+                    badges: 'Core Contributor'
+                }),
+            });
+
+            const result = await response.json();
+            console.log("Success:", result);
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }, []);
+
+
+    return (
+        <>
+            <button onClick={login}>Mit Zupass anmelden</button>
+        </>
+    );
 }

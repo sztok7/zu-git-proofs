@@ -1,6 +1,6 @@
 # zu-git-proofs
 
-Zu-Pass-Proofs project enables anonymous feedback in forums by assigning credibility badges based on GitHub contributions (e.g., Core Ethereum Contributor). Zu-Pass-Proofs ensures that participants can stay anon while being recognized and trusted with proven expertise. This approach fosters high-quality and reliable community discussions and governance while first maintaining user privacy, using [Zupass](https://zupass.org/).
+Zu-Git-Proofs project enables anonymous feedback in forums by assigning credibility badges based on GitHub contributions (e.g., Core Ethereum Contributor). Zu-Git-Proofs ensures that participants can stay anon while being recognized and trusted with proven expertise. This approach fosters high-quality and reliable community discussions and governance while first maintaining user privacy, using [Zupass](https://zupass.org/).
 
 ## Development Prerequisites
 

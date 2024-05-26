@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { redirect } from 'react-router-dom';
 
 export default function GitHubCallback() {
 
@@ -15,7 +16,7 @@ export default function GitHubCallback() {
             })
             .then(response => response.json())
             .then(data => {
-                // close popup
+                redirect('/')
             });
         }
     }, []);

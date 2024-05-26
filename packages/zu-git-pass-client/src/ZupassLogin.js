@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { getWithoutProvingUrl } from '@pcd/passport-interface/PassportInterface';
 import { zupassPopupExecute } from '@pcd/passport-interface';
-import { MessagePCDPackage } from '@pcd/message-pcd'
 
 const constructProofUrl = () => {
     return getWithoutProvingUrl('https://zupass.org', window.location.href, 'message-pcd', true)
@@ -13,16 +12,13 @@ export default function ZupassLogin() {
 
         const result = await zupassPopupExecute(proofUrl)
 
-
         if (result.type !== 'pcd') return
 
-        console.log(result.pcdStr)
+        //const pcd = MessagePCDPackage.deserialize(result.pcdStr)
 
-        const pcd = MessagePCDPackage.deserialize(result.pcdStr)
+        const discourseUrl = process.env.REACT_APP_DISCOURSE_URL // searchParams.get('discourse_url')
 
-        console.log(pcd)
-
-        const discourseUrl = process.env.DISCOURSE_URL // searchParams.get('discourse_url')
+        window.location.href = discourseUrl
 
         try {
             const response = await fetch(discourseUrl, {
@@ -39,6 +35,8 @@ export default function ZupassLogin() {
 
             const result = await response.json();
             console.log("Success:", result);
+
+            window.location.href = discourseUrl
         } catch (error) {
             console.error("Error:", error);
         }
@@ -46,8 +44,6 @@ export default function ZupassLogin() {
 
 
     return (
-        <>
-            <button onClick={login}>Mit Zupass anmelden</button>
-        </>
+            <button onClick={login} className='btn-github'>Mit Zupass anmelden</button>
     );
 }

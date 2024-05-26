@@ -11,7 +11,7 @@ export default function GitHubCallback() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 // TODO figure out from where to take zupass email
-                body: JSON.stringify({ code, zupassEmail: "marin@chainsafe.io" }),
+                body: JSON.stringify({ code, zupassEmail: "filip.stokovic@chainsafe.io" }),
             })
             .then(response => response.json())
             .then(data => {
